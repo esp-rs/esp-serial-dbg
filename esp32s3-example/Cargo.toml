@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 esp32s3-hal = { package = "esp32s3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
 esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = ["esp32s3", "panic-handler", "print-uart"] }
 esp-println = { version = "0.2.1", features = ["esp32s3"]}
-esp-serial-dbg = { path = "/projects/esp/esp-serial-dbg/esp-serial-dbg", features = ["esp32s3"] }
+esp-serial-dbg = { path = "../esp-serial-dbg", features = ["esp32s3"] }
 
 xtensa-lx-rt = { version = "0.13.0", features = ["esp32s3"], optional = true }
 xtensa-lx = { version = "0.7.0", features = ["esp32s3"] }
