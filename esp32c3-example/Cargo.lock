@@ -30,6 +30,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "critical-section"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d02ba51481d019be9c74a831d1133c364d78831b75c833478f3a21e1fd91e01a"
+
+[[package]]
 name = "darling"
 version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -85,8 +91,8 @@ dependencies = [
 
 [[package]]
 name = "esp-backtrace"
-version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-backtrace#3c1b5f69e6d6b7e65d0bb96eb9599cfda06a0d86"
+version = "0.2.0"
+source = "git+https://github.com/esp-rs/esp-backtrace#cccea92d201977488b17782eab11fdc61270de1b"
 dependencies = [
  "esp-println",
  "riscv",
@@ -95,9 +101,10 @@ dependencies = [
 [[package]]
 name = "esp-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#2fe27536aac810b74e96aa651ff14d98a23ab7fc"
+source = "git+https://github.com/esp-rs/esp-hal.git#4c943378f87e6f6b77e489cf50a0fe75ca067dd7"
 dependencies = [
  "cfg-if",
+ "critical-section",
  "embedded-hal 0.2.7",
  "esp-hal-procmacros",
  "esp32c3",
@@ -112,7 +119,7 @@ dependencies = [
 [[package]]
 name = "esp-hal-procmacros"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#2fe27536aac810b74e96aa651ff14d98a23ab7fc"
+source = "git+https://github.com/esp-rs/esp-hal.git#4c943378f87e6f6b77e489cf50a0fe75ca067dd7"
 dependencies = [
  "darling",
  "proc-macro-error",
@@ -131,6 +138,7 @@ checksum = "dab33baae57ce7c0869c32885ff136f9c8405e0c201d039ccd767c3e7f79502b"
 name = "esp-serial-dbg"
 version = "0.1.0"
 dependencies = [
+ "critical-section",
  "embedded-hal 0.2.7",
  "esp-println",
  "esp32c3-hal",
@@ -139,8 +147,9 @@ dependencies = [
 
 [[package]]
 name = "esp32c3"
-version = "0.4.0"
-source = "git+https://github.com/esp-rs/esp-pacs.git?branch=with_source#23f9f7626867c98c98bac45f93109a8b794dbb66"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79e9b4b4c623a6567e3282ec5df2daf38f1da7631b41da5be8c94432db8e11aa"
 dependencies = [
  "bare-metal",
  "riscv",
@@ -163,9 +172,8 @@ dependencies = [
 [[package]]
 name = "esp32c3-hal"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#2fe27536aac810b74e96aa651ff14d98a23ab7fc"
+source = "git+https://github.com/esp-rs/esp-hal.git#4c943378f87e6f6b77e489cf50a0fe75ca067dd7"
 dependencies = [
- "bare-metal",
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0-alpha.8",
  "esp-hal-common",

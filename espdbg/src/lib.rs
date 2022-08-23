@@ -21,11 +21,13 @@ const BREAK_CMD: u8 = 0xfe;
 
 const READ_MEM_RESPONSE: u8 = 0x00;
 const HIT_BREAKPOINT_RESPONSE: u8 = 0x01;
+const ACK_RESPONSE: u8 = 0x02;
 
 #[derive(Debug, Clone)]
 pub enum DeviceMessage {
     MemoryDump(Vec<u8>),
     HitBreakpoint(Registers),
+    Ack,
 }
 
 // TODO hide those pub fields!
@@ -147,6 +149,12 @@ impl SerialDebugConnection {
         }
         cmd.push(MESSAGE_END); // end of cmd
         self.sender.lock().unwrap().send(cmd).unwrap();
+
+        loop {
+            if let Some(DeviceMessage::Ack) = self.messages.lock().unwrap().pop() {
+                return;
+            }
+        }
     }
 
     pub fn set_breakpoint(&self, addr: u32, id: u8) {
@@ -160,6 +168,12 @@ impl SerialDebugConnection {
         cmd.push(MESSAGE_END); // end of cmd
 
         self.sender.lock().unwrap().send(cmd).unwrap();
+
+        loop {
+            if let Some(DeviceMessage::Ack) = self.messages.lock().unwrap().pop() {
+                return;
+            }
+        }
     }
 
     pub fn clear_breakpoint(&self, id: u8) {
@@ -172,6 +186,12 @@ impl SerialDebugConnection {
         cmd.push(MESSAGE_END); // end of cmd
 
         self.sender.lock().unwrap().send(cmd).unwrap();
+
+        loop {
+            if let Some(DeviceMessage::Ack) = self.messages.lock().unwrap().pop() {
+                return;
+            }
+        }
     }
 
     pub fn resume(&self) {
@@ -183,6 +203,12 @@ impl SerialDebugConnection {
         cmd.push(MESSAGE_END); // end of cmd
 
         self.sender.lock().unwrap().send(cmd).unwrap();
+
+        loop {
+            if let Some(DeviceMessage::Ack) = self.messages.lock().unwrap().pop() {
+                return;
+            }
+        }
     }
 
     pub fn break_execution(&self) {
@@ -215,6 +241,9 @@ impl SerialDebugConnection {
                     .lock()
                     .unwrap()
                     .push(DeviceMessage::HitBreakpoint(regs));
+            }
+            ACK_RESPONSE => {
+                self.messages.lock().unwrap().push(DeviceMessage::Ack);
             }
             _ => panic!("received unknown packet {}", packet[1]),
         }
