@@ -19,11 +19,6 @@ use hal::macros::interrupt;
 use hal::pac;
 use hal::prelude::nb;
 use hal::{serial::config::AtCmdConfig, Serial};
-#[cfg(target_arch = "riscv32")]
-use riscv::interrupt as arch_interrupt;
-
-#[cfg(target_arch = "xtensa")]
-use xtensa_lx::interrupt as arch_interrupt;
 
 const MAX_COMMAND_BUFFER: usize = 256;
 
@@ -39,6 +34,7 @@ const BREAK_CMD: u8 = 0xfe;
 
 const READ_MEM_RESPONSE: u8 = 0x00;
 const HIT_BREAKPOINT_RESPONSE: u8 = 0x01;
+const ACK_RESPONSE: u8 = 0x02;
 
 #[cfg_attr(target_arch = "riscv32", path = "riscv.rs")]
 #[cfg_attr(target_arch = "xtensa", path = "xtensa.rs")]
@@ -96,13 +92,13 @@ pub fn init(mut serial: Serial<hal::pac::UART0>) {
 
     #[cfg(target_arch = "riscv32")]
     unsafe {
-        arch_interrupt::enable();
+        riscv::interrupt::enable();
     }
 }
 
 #[interrupt]
 fn UART0(trap_frame: &mut ExceptionContext) {
-    arch_interrupt::free(|_cs| {
+    critical_section::with(|_cs| {
         #[cfg(target_arch = "riscv32")]
         let mepc = riscv::register::mepc::read();
         #[cfg(target_arch = "xtensa")]
@@ -128,6 +124,7 @@ fn serial_com_halted(
         serial.reset_at_cmd_interrupt();
 
         if buffer[1] == RESUME_CMD {
+            send_ack(serial);
             return;
         } else {
             handle_cmd(&buffer, len, serial, trap_frame, mepc, true);
@@ -183,7 +180,7 @@ fn handle_break(
     from_halted_state: bool,
 ) {
     // breakpoint
-    arch_interrupt::free(|_cs| {
+    critical_section::with(|_cs| {
         let regs_raw = arch::serialze_registers(context, mepc);
 
         crate::write_response(
@@ -198,6 +195,10 @@ fn handle_break(
             crate::serial_com_halted(serial, context, mepc);
         }
     });
+}
+
+fn send_ack(serial: &mut Serial<hal::pac::UART0>) {
+    write_response(serial, ACK_RESPONSE, 0, &mut [].into_iter());
 }
 
 fn readmem_cmd(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
@@ -218,7 +219,7 @@ fn readmem_cmd(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UA
     );
 }
 
-fn writemem_cmd(buffer: &[u8; 256], cnt: usize, _serial: &mut Serial<hal::pac::UART0>) {
+fn writemem_cmd(buffer: &[u8; 256], cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
     let addr = u32::from_le_bytes(buffer[6..][..4].try_into().unwrap());
 
     let ptr = addr as *mut u32;
@@ -229,17 +230,23 @@ fn writemem_cmd(buffer: &[u8; 256], cnt: usize, _serial: &mut Serial<hal::pac::U
             ptr.offset(((i - 10) / 4) as isize).write_volatile(word);
         }
     }
+
+    send_ack(serial);
 }
 
-fn set_breakpoint(buffer: &[u8; 256], _cnt: usize, _serial: &mut Serial<hal::pac::UART0>) {
+fn set_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
     let addr = u32::from_le_bytes(buffer[6..][..4].try_into().unwrap());
     let id = buffer[10];
     arch::set_breakpoint(id, addr);
+
+    send_ack(serial);
 }
 
-fn clear_breakpoint(buffer: &[u8; 256], _cnt: usize, _serial: &mut Serial<hal::pac::UART0>) {
+fn clear_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
     let id = buffer[6];
     arch::clear_breakpoint(id);
+
+    send_ack(serial);
 }
 
 fn write_response(
