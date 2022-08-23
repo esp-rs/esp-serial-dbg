@@ -1,29 +1,6 @@
-use crate::hal;
+use super::with_serial;
 use crate::hal::interrupt::TrapFrame;
-use crate::hal::Serial;
 use core::arch::asm;
-use core::cell::RefCell;
-use riscv::interrupt::Mutex;
-
-static mut SERIAL: Mutex<RefCell<Option<Serial<hal::pac::UART0>>>> = Mutex::new(RefCell::new(None));
-
-pub fn store_serial(serial: Serial<hal::pac::UART0>) {
-    riscv::interrupt::free(|_cs| unsafe {
-        SERIAL.get_mut().replace(Some(serial));
-    });
-}
-
-pub fn with_serial<F, R>(f: F) -> R
-where
-    F: FnOnce(&mut Serial<hal::pac::UART0>) -> R,
-{
-    riscv::interrupt::free(|cs| {
-        let mut serial = unsafe { SERIAL.borrow(*cs).borrow_mut() };
-        let serial = serial.as_mut().unwrap();
-
-        f(serial)
-    })
-}
 
 pub fn init() {
     set_breakpoint(0, 0xffffffff); // no breakpoints without this?
@@ -73,7 +50,7 @@ fn exception_handler(context: &mut TrapFrame) {
 
     if code == 3 {
         // breakpoint
-        riscv::interrupt::free(|_cs| {
+        critical_section::with(|_cs| {
             with_serial(|serial| {
                 let regs_raw = serialze_registers(context, mepc);
 

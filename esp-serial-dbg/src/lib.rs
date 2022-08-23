@@ -1,6 +1,8 @@
 #![no_std]
 #![cfg_attr(target_arch = "xtensa", feature(asm_experimental_arch))]
 
+use core::cell::RefCell;
+use critical_section::Mutex;
 use embedded_hal::serial::Read;
 use embedded_hal::serial::Write;
 #[cfg(feature = "esp32")]
@@ -47,6 +49,26 @@ type ExceptionContext = crate::hal::interrupt::TrapFrame;
 #[cfg(target_arch = "xtensa")]
 type ExceptionContext = xtensa_lx_rt::exception::Context;
 
+static SERIAL: Mutex<RefCell<Option<Serial<hal::pac::UART0>>>> = Mutex::new(RefCell::new(None));
+
+pub fn store_serial(serial: Serial<hal::pac::UART0>) {
+    critical_section::with(|cs| {
+        SERIAL.borrow(cs).replace(Some(serial));
+    });
+}
+
+pub fn with_serial<F, R>(f: F) -> R
+where
+    F: FnOnce(&mut Serial<hal::pac::UART0>) -> R,
+{
+    critical_section::with(|cs| {
+        let mut serial = SERIAL.borrow(cs).borrow_mut();
+        let serial = serial.as_mut().unwrap();
+
+        f(serial)
+    })
+}
+
 /// Currently only UART0 supported
 pub fn init(mut serial: Serial<hal::pac::UART0>) {
     arch::init();
@@ -70,7 +92,7 @@ pub fn init(mut serial: Serial<hal::pac::UART0>) {
     )
     .unwrap();
 
-    arch::store_serial(serial);
+    store_serial(serial);
 
     #[cfg(target_arch = "riscv32")]
     unsafe {
@@ -85,7 +107,7 @@ fn UART0(trap_frame: &mut ExceptionContext) {
         let mepc = riscv::register::mepc::read();
         #[cfg(target_arch = "xtensa")]
         let mepc = trap_frame.PC as usize;
-        arch::with_serial(|serial| {
+        with_serial(|serial| {
             let mut buffer = [0u8; MAX_COMMAND_BUFFER];
             let len = read_command(serial, &mut buffer);
             handle_cmd(&buffer, len, serial, trap_frame, mepc, false);
@@ -154,7 +176,12 @@ fn handle_cmd(
     }
 }
 
-fn handle_break(serial: &mut Serial<hal::pac::UART0>, context: &mut ExceptionContext, mepc: usize, from_halted_state: bool) {
+fn handle_break(
+    serial: &mut Serial<hal::pac::UART0>,
+    context: &mut ExceptionContext,
+    mepc: usize,
+    from_halted_state: bool,
+) {
     // breakpoint
     arch_interrupt::free(|_cs| {
         let regs_raw = arch::serialze_registers(context, mepc);

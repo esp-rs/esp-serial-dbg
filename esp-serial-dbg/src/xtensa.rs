@@ -1,35 +1,5 @@
-use crate::hal;
-use crate::hal::Serial;
+use super::with_serial;
 use core::arch::asm;
-use core::cell::RefCell;
-use xtensa_lx::mutex::Mutex;
-
-#[cfg(feature = "esp32s2")]
-use xtensa_lx::mutex::CriticalSectionMutex as XtensaMutex;
-#[cfg(not(feature = "esp32s2"))]
-use xtensa_lx::mutex::SpinLockMutex as XtensaMutex;
-
-static mut SERIAL: XtensaMutex<RefCell<Option<Serial<hal::pac::UART0>>>> =
-    XtensaMutex::new(RefCell::new(None));
-
-pub fn store_serial(serial: Serial<hal::pac::UART0>) {
-    unsafe {
-        (&SERIAL).lock(|data| (*data).replace(Some(serial)));
-    }
-}
-
-pub fn with_serial<F, R>(f: F) -> R
-where
-    F: FnOnce(&mut Serial<hal::pac::UART0>) -> R,
-{
-    unsafe {
-        (&SERIAL).lock(|data| {
-            let mut serial = data.borrow_mut();
-            let serial = serial.as_mut().unwrap();
-            f(serial)
-        })
-    }
-}
 
 pub fn init() {
     // nothing

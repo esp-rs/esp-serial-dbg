@@ -13,6 +13,7 @@ esp32-hal = { package = "esp32-hal", git = "https://github.com/esp-rs/esp-hal.gi
 esp32s2-hal = { package = "esp32s2-hal", git = "https://github.com/esp-rs/esp-hal.git", optional = true }
 esp32s3-hal = { package = "esp32s3-hal", git = "https://github.com/esp-rs/esp-hal.git", optional = true }
 embedded-hal = "0.2.7"
+critical-section = "1.1.0"
 
 [features]
 esp32c3 = [ "esp-println?/esp32c3", "riscv", "esp32c3-hal" ]
