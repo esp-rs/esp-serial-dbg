@@ -14,7 +14,7 @@ use gdbstub::{
                 singlethread::{SingleThreadBase, SingleThreadResume, SingleThreadResumeOps},
                 BaseOps,
             },
-            breakpoints::{SwBreakpoint, WatchKind},
+            breakpoints::{HwBreakpoint, SwBreakpoint, WatchKind},
             memory_map::MemoryMap,
         },
         TargetError, TargetResult,
@@ -87,6 +87,15 @@ where
             info!("GDB Err {:?}", err);
         }
     }
+
+    // clear breakpoints and resume
+    for bp in trgt.hw_breakpoints.clone().iter() {
+        trgt.remove_hw_breakpoint(bp.address, 0).ok();
+    }
+    for bp in trgt.sw_breakpoints.clone().iter() {
+        trgt.remove_sw_breakpoint(bp.address, 0).ok();
+    }
+    trgt.resume(None).ok();
 
     Ok(())
 }
