@@ -115,7 +115,7 @@ impl EspRegisters for XtensaEsp32Registers {
 <memory-map>
     <memory type="rom" start="0x400D0000" length="0x330000"/>
     <memory type="rom" start="0x3F400000" length="0x330000"/>
-    <memory type="ram" start="0x400C0000" length="0x2000"/>
+    <memory type="ram" start="0x40070000" length="0x60000"/>
     <memory type="ram" start="0x3FFAE000" length="0x52000"/>
     <memory type="ram" start="0x3FF80000" length="0x2000"/>
     <memory type="ram" start="0x50000000" length="0x2000"/>
