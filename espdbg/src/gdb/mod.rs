@@ -22,16 +22,16 @@ use gdbstub::{
 };
 use log::{info, trace};
 
-pub mod riscv;
+pub mod riscv_esp32c3;
 mod riscv_insn_estimator;
 pub mod xtensa_esp32;
 pub mod xtensa_esp32s2;
 pub mod xtensa_esp32s3;
-mod xtensa_isn_estimator;
+mod xtensa_insn_estimator;
 
 use crate::{
     gdb::{
-        riscv_insn_estimator::riscv_insn_estimator, xtensa_isn_estimator::xtensa_insn_estimator,
+        riscv_insn_estimator::riscv_insn_estimator, xtensa_insn_estimator::xtensa_insn_estimator,
     },
     DeviceMessage, SerialDebugConnection,
 };

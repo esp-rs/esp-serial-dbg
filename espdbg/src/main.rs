@@ -70,7 +70,7 @@ fn run_gdb(dbg: SerialDebugConnection) {
     thread::scope(|s| {
         s.spawn(|| loop {
             match dbg.chip {
-                Chip::Esp32C3 => gdb::gdb_main::<gdb::riscv::RiscvRegisters>(&dbg).unwrap(),
+                Chip::Esp32C3 => gdb::gdb_main::<gdb::riscv_esp32c3::RiscvRegisters>(&dbg).unwrap(),
                 Chip::Esp32 => {
                     gdb::gdb_main::<gdb::xtensa_esp32::XtensaEsp32Registers>(&dbg).unwrap()
                 }
