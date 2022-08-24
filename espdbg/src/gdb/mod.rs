@@ -263,9 +263,53 @@ where
 
         info!("aligned to {:x} {} {}", aligned_start, aligned_len, offset);
 
-        let read_data = self
+        let mut read_data = self
             .debug_connection
             .read_memory(aligned_start, aligned_len as u32);
+
+        // we might have read memory with breakpoint instructions inserted by us!
+        // let's fix that
+        let end = aligned_start + aligned_len as u32;
+        for sw_brkpt in self.sw_breakpoints.iter() {
+            if sw_brkpt.address + sw_brkpt.original_code.len() as u32 >= aligned_start
+                && sw_brkpt.address <= end
+            {
+                let rem_len = if sw_brkpt.address >= aligned_start {
+                    usize::min(
+                        sw_brkpt.original_code.len(),
+                        (end - sw_brkpt.address) as usize,
+                    )
+                } else {
+                    sw_brkpt.original_code.len() - (aligned_start - sw_brkpt.address) as usize
+                };
+                let start_in_original_code =
+                    i64::max(0, aligned_start as i64 - sw_brkpt.address as i64) as usize;
+                let start_in_data =
+                    i64::max(0, sw_brkpt.address as i64 - aligned_start as i64) as usize;
+                read_data[start_in_data..][..rem_len]
+                    .copy_from_slice(&sw_brkpt.original_code[start_in_original_code..][..rem_len]);
+            }
+        }
+        for sw_brkpt in self.temporarly_disabled_sw_breakpoints.iter() {
+            if sw_brkpt.address + sw_brkpt.original_code.len() as u32 >= aligned_start
+                && sw_brkpt.address <= end
+            {
+                let rem_len = if sw_brkpt.address >= aligned_start {
+                    usize::min(
+                        sw_brkpt.original_code.len(),
+                        (end - sw_brkpt.address) as usize,
+                    )
+                } else {
+                    sw_brkpt.original_code.len() - (aligned_start - sw_brkpt.address) as usize
+                };
+                let start_in_original_code =
+                    i64::max(0, aligned_start as i64 - sw_brkpt.address as i64) as usize;
+                let start_in_data =
+                    i64::max(0, sw_brkpt.address as i64 - aligned_start as i64) as usize;
+                read_data[start_in_data..][..rem_len]
+                    .copy_from_slice(&sw_brkpt.original_code[start_in_original_code..][..rem_len]);
+            }
+        }
 
         data.copy_from_slice(&read_data[offset..][..(data.len())]);
         Ok(())
@@ -315,23 +359,6 @@ where
 {
     fn resume(&mut self, _signal: Option<gdbstub::common::Signal>) -> Result<(), Self::Error> {
         info!("resume requested");
-
-        // temporarly remove sw-breakpoints that might interfere with the current PC
-        // will get restored when next break occurs
-        let pc = match self.registers {
-            espdbg::Registers::Riscv(regs) => regs.pc,
-            espdbg::Registers::Xtensa(regs) => regs.pc,
-        };
-        let mut to_disable = Vec::new();
-        for bp in &self.sw_breakpoints {
-            if bp.address >= pc - 4 && bp.address <= pc + 4 {
-                to_disable.push(bp.clone());
-            }
-        }
-        for bp in to_disable {
-            self.remove_sw_breakpoint(bp.address, 0).ok();
-            self.temporarly_disabled_sw_breakpoints.push(bp);
-        }
 
         self.stepping = false;
         self.debug_connection.resume();

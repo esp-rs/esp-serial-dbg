@@ -93,7 +93,7 @@ impl EspRegisters for XtensaEsp32S2Registers {
     }
 
     fn sw_breakpoint_opcode() -> (usize, [u8; 3]) {
-        (3, [0xf0, 0x41, 0x00])
+        (2, [0x2d, 0xf1, 0x00])
     }
 
     fn hw_breakpoint_start() -> u8 {
