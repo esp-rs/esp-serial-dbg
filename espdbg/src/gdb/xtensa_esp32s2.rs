@@ -83,12 +83,13 @@ impl EspRegisters for XtensaEsp32S2Registers {
     PUBLIC "+//IDN gnu.org//DTD GDB Memory Map V1.0//EN"
             "http://sourceware.org/gdb/gdb-memory-map.dtd">
 <memory-map>
-    <memory type="rom" start="0x40080000" length="0x780000"/>
-    <memory type="rom" start="0x3F000000" length="0xF80000"/>
-    <memory type="ram" start="0x40020000" length="0x50000"/>
-    <memory type="ram" start="0x40070000" length="0x2000"/>
-    <memory type="ram" start="0x3ff9e000" length="0x2000"/>
-    <memory type="ram" start="0x3FFB0000" length="0x50000"/>
+    <memory type="rom" start="0x40000000" length="0x1FFFF"/>
+    <memory type="ram" start="0x3ff9e000" length="0x1fff"/>
+    <memory type="ram" start="0x50000000" length="0x1fff"/>
+    <memory type="ram" start="0x3FFB0000" length="0x4ffff"/>
+    <memory type="ram" start="0x40020000" length="0x4ffff"/>
+    <memory type="rom" start="0x40080000" length="0x401000"/>
+    <memory type="rom" start="0x3F000000" length="0x401000"/>
 </memory-map>"#
     }
 

@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GDB",
+            "type": "gdb",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "target": "${workspaceRoot}/target/xtensa-esp32s2-none-elf/debug/esp32s2_example",
+            "gdbpath": "xtensa-esp32s2-elf-gdb",
+            "autorun": [
+                "set arch xtensa",
+                "target remote localhost:9001",
+                "symbol-file ./target/xtensa-esp32s2-none-elf/debug/esp32s2_example",
+            ],
+            //"printCalls": true,     
+            //"showDevDebugOutput": true,
+            //"valuesFormatting": "parseText",
+        }
+    ]
+}

@@ -1,0 +1,19 @@
+[package]
+name = "esp32s2_example"
+version = "0.1.0"
+authors = ["bjoernQ <bjoern.quentin@mobile-j.de>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+esp32s2-hal = { package = "esp32s2-hal", git = "https://github.com/esp-rs/esp-hal.git" }
+esp-backtrace = { version = "0.2.0", features = ["esp32s2", "panic-handler", "print-uart"] }
+esp-println = { version = "0.2.2", features = ["esp32s2"]}
+esp-serial-dbg = { path = "../esp-serial-dbg", features = ["esp32s2"] }
+
+xtensa-lx-rt = { version = "0.13.0", features = ["esp32s2"], optional = true }
+xtensa-lx = { version = "0.7.0", features = ["esp32s3"] }
+
+[features]
+default = ["rt"]
+rt = ["xtensa-lx-rt"]
