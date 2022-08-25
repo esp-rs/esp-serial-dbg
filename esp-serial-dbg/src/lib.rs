@@ -31,10 +31,19 @@ const CLEAR_BREAKPOINT_CMD: u8 = 0x02;
 const WRITE_MEM_CMD: u8 = 0x03;
 const RESUME_CMD: u8 = 0xff;
 const BREAK_CMD: u8 = 0xfe;
+const HELLO_CMD: u8 = 0x04;
 
 const READ_MEM_RESPONSE: u8 = 0x00;
 const HIT_BREAKPOINT_RESPONSE: u8 = 0x01;
 const ACK_RESPONSE: u8 = 0x02;
+const HELLO_RESPONSE: u8 = 0x03;
+
+pub const CHIP_ESP32: u8 = 0;
+pub const CHIP_ESP32S2: u8 = 1;
+pub const CHIP_ESP32S3: u8 = 2;
+pub const CHIP_ESP32C3: u8 = 3;
+
+pub const PROTOCOL_VERSION: u32 = 0;
 
 #[cfg_attr(target_arch = "riscv32", path = "riscv.rs")]
 #[cfg_attr(target_arch = "xtensa", path = "xtensa.rs")]
@@ -169,6 +178,7 @@ fn handle_cmd(
         CLEAR_BREAKPOINT_CMD => clear_breakpoint(buffer, cnt, serial),
         BREAK_CMD => handle_break(serial, trap_frame, mepc, from_halted_state),
         WRITE_MEM_CMD => writemem_cmd(buffer, cnt, serial),
+        HELLO_CMD => handle_hello(buffer, cnt, serial),
         _ => {}
     }
 }
@@ -247,6 +257,30 @@ fn clear_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pa
     arch::clear_breakpoint(id);
 
     send_ack(serial);
+}
+
+fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+    #[cfg(feature = "esp32")]
+    let chip = CHIP_ESP32;
+
+    #[cfg(feature = "esp32s2")]
+    let chip = CHIP_ESP32S2;
+
+    #[cfg(feature = "esp32s3")]
+    let chip = CHIP_ESP32S3;
+
+    #[cfg(feature = "esp32c3")]
+    let chip = CHIP_ESP32C3;
+
+    let mut payload = [chip, 0, 0, 0, 0];
+
+    payload[1..].copy_from_slice(&PROTOCOL_VERSION.to_le_bytes());
+    write_response(
+        serial,
+        HELLO_RESPONSE,
+        payload.len(),
+        &mut payload.into_iter(),
+    );
 }
 
 fn write_response(

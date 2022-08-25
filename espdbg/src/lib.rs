@@ -18,16 +18,26 @@ const CLEAR_BREAKPOINT_CMD: u8 = 0x02;
 const WRITE_MEM_CMD: u8 = 0x03;
 const RESUME_CMD: u8 = 0xff;
 const BREAK_CMD: u8 = 0xfe;
+const HELLO_CMD: u8 = 0x04;
 
 const READ_MEM_RESPONSE: u8 = 0x00;
 const HIT_BREAKPOINT_RESPONSE: u8 = 0x01;
 const ACK_RESPONSE: u8 = 0x02;
+const HELLO_RESPONSE: u8 = 0x03;
+
+pub const CHIP_ESP32: u8 = 0;
+pub const CHIP_ESP32S2: u8 = 1;
+pub const CHIP_ESP32S3: u8 = 2;
+pub const CHIP_ESP32C3: u8 = 3;
+
+pub const SUPPORTED_PROTOCOL_VERSION: u32 = 0;
 
 #[derive(Debug, Clone)]
 pub enum DeviceMessage {
     MemoryDump(Vec<u8>),
     HitBreakpoint(Registers),
     Ack,
+    Hello { chip: u8, protocol_version: u32 },
 }
 
 // TODO hide those pub fields!
@@ -117,6 +127,33 @@ impl SerialDebugConnection {
 
     pub fn pending_message(&self) -> Option<DeviceMessage> {
         self.messages.lock().unwrap().pop()
+    }
+
+    pub fn hello(&self, timeout: std::time::Duration) -> Result<(u8, u32), ()> {
+        let pkt_len: u32 = 4 + 1;
+        let mut cmd: Vec<u8> = Vec::new();
+        cmd.push(MESSAGE_START); // cmd start
+        cmd.push(HELLO_CMD); // write mem
+        cmd.extend_from_slice(&pkt_len.to_le_bytes());
+        cmd.push(MESSAGE_END); // end of cmd
+        self.sender.lock().unwrap().send(cmd).unwrap();
+
+        let started = std::time::SystemTime::now();
+        loop {
+            if let Some(msg) = self.messages.lock().unwrap().pop() {
+                if let DeviceMessage::Hello {
+                    chip,
+                    protocol_version,
+                } = msg
+                {
+                    return Ok((chip, protocol_version));
+                }
+            }
+
+            if std::time::SystemTime::now() > started + timeout {
+                return Err(());
+            }
+        }
     }
 
     pub fn read_memory(&self, addr: u32, len: u32) -> Vec<u8> {
@@ -245,8 +282,25 @@ impl SerialDebugConnection {
             ACK_RESPONSE => {
                 self.messages.lock().unwrap().push(DeviceMessage::Ack);
             }
+            HELLO_RESPONSE => {
+                let chip = packet[6];
+                let protocol_version = u32::from_le_bytes(packet[7..][..4].try_into().unwrap());
+                let hello = DeviceMessage::Hello {
+                    chip,
+                    protocol_version,
+                };
+                self.messages.lock().unwrap().push(hello);
+            }
             _ => panic!("received unknown packet {}", packet[1]),
         }
+    }
+
+    pub fn reset_target(&self) {
+        let mut serial = self.port.lock().unwrap();
+        serial.write_data_terminal_ready(false).ok();
+        serial.write_request_to_send(true).ok();
+        std::thread::sleep(std::time::Duration::from_millis(100));
+        serial.write_request_to_send(false).ok();
     }
 }
 

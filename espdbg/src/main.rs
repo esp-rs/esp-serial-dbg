@@ -85,6 +85,11 @@ fn run_gdb(dbg: SerialDebugConnection) {
 
         s.spawn(|| dbg.start());
 
+        let response = dbg.hello(std::time::Duration::from_millis(2000));
+        if let Err(_) = response {
+            dbg.reset_target();
+        }
+
         // TODO graceful shutdown on ctrl-c
         // dbg.shutdown();
         // std::process::exit(0);
@@ -94,6 +99,11 @@ fn run_gdb(dbg: SerialDebugConnection) {
 fn run_cli(dbg: SerialDebugConnection) {
     thread::scope(|s| {
         s.spawn(|| dbg.start());
+
+        let response = dbg.hello(std::time::Duration::from_millis(2000));
+        if let Err(_) = response {
+            dbg.reset_target();
+        }
 
         let mut input_mode = false;
         let mut rl = Editor::<()>::new().unwrap();
