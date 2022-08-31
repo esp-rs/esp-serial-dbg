@@ -126,14 +126,15 @@ version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1cc04e4a62fe7905eab18e12715feaded6cb51a5a878a0c067bbe29436bad96a"
 dependencies = [
- "esp-println",
+ "esp-println 0.2.2",
  "xtensa-lx-rt",
 ]
 
 [[package]]
 name = "esp-hal-common"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#5e6234dcc42e03589f320cc99d7d330fde2e0220"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "143122333f2b9575cc78020c00e65e3690de2e9545d7f2c9b04f97fb31156138"
 dependencies = [
  "cfg-if",
  "critical-section",
@@ -151,7 +152,8 @@ dependencies = [
 [[package]]
 name = "esp-hal-procmacros"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#5e6234dcc42e03589f320cc99d7d330fde2e0220"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dd1fb5018ef2c57daadf84e9bbff1c9e48c04958d32bc1469f781a96ec82e8e"
 dependencies = [
  "darling",
  "proc-macro-error",
@@ -167,12 +169,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dab33baae57ce7c0869c32885ff136f9c8405e0c201d039ccd767c3e7f79502b"
 
 [[package]]
+name = "esp-println"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61434785da602a7838c360031628ac3cd0bd9e3412b618f2af000050541778ec"
+
+[[package]]
 name = "esp-serial-dbg"
 version = "0.1.0"
 dependencies = [
  "critical-section",
  "embedded-hal 0.2.7",
- "esp-println",
  "esp32s2-hal",
  "xtensa-lx",
  "xtensa-lx-rt",
@@ -193,7 +200,8 @@ dependencies = [
 [[package]]
 name = "esp32s2-hal"
 version = "0.1.0"
-source = "git+https://github.com/esp-rs/esp-hal.git#5e6234dcc42e03589f320cc99d7d330fde2e0220"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6a8c5fdbe523304695cba908a265d20fa9e34edb3ce8af898f2d0867a8922f2"
 dependencies = [
  "embedded-hal 0.2.7",
  "embedded-hal 1.0.0-alpha.8",
@@ -207,7 +215,7 @@ name = "esp32s2_example"
 version = "0.1.0"
 dependencies = [
  "esp-backtrace",
- "esp-println",
+ "esp-println 0.3.0",
  "esp-serial-dbg",
  "esp32s2-hal",
  "xtensa-lx",

@@ -6,9 +6,9 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-esp32-hal = { package = "esp32-hal", git = "https://github.com/esp-rs/esp-hal.git" }
-esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = ["esp32", "panic-handler", "print-uart"] }
-esp-println = { version = "0.2.1", features = ["esp32"]}
+esp32-hal = { version = "0.4.0" }
+esp-backtrace = { version = "0.2.0" , features = ["esp32", "panic-handler", "print-uart"] }
+esp-println = { version = "0.3.0", features = ["esp32"]}
 esp-serial-dbg = { path = "../esp-serial-dbg", features = ["esp32"] }
 
 xtensa-lx-rt = { version = "0.13.0", features = ["esp32"], optional = true }

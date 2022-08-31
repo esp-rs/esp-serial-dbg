@@ -6,11 +6,11 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-esp32c3-hal = { package = "esp32c3-hal", git = "https://github.com/esp-rs/esp-hal.git" }
-esp-backtrace = { git = "https://github.com/esp-rs/esp-backtrace", features = ["esp32c3", "panic-handler", "print-uart"] }
+esp32c3-hal = { version = "0.1.0" }
+esp-backtrace = { version = "0.2.0", features = ["esp32c3", "panic-handler", "print-uart"] }
 riscv-rt = { version = "0.9", optional = true }
 esp-serial-dbg = { path = "../esp-serial-dbg", features = ["esp32c3"] }
-esp-println = { version = "0.2.1", features = ["esp32c3"]}
+esp-println = { version = "0.3.0", features = ["esp32c3"]}
 riscv = "0.8.0"
 
 [features]

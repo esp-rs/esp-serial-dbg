@@ -2,9 +2,9 @@
 
 ## About
 
-_This is still work in progress! At least the contained examples should work fine on ESP32, ESP32-S3 and ESP32-C3. For ESP32-S2 it currently seems that the GDB server has some issues._
+_This is experimental! At least the contained examples should work fine on ESP32, ESP32-S2, ESP32-S3 and ESP32-C3._
 
-This is a way to do some basic debugging via a serial connection on ESP32, ESP32-S3 and ESP32-C3 and ESP32-S2 without additional hardware when developing code with `esp-hal`.
+This is a way to do some basic debugging via a serial connection on ESP32, ESP32-S3,ESP32-C3 and ESP32-S2 without additional hardware when developing code with `esp-hal`.
 
 ## Basic Usage
 
@@ -17,7 +17,7 @@ This is a way to do some basic debugging via a serial connection on ESP32, ESP32
 - add a launch configuration similar to those contained in the examples
 - launch a debug session
 
-Currently before each debug session you should restart the target and restart `espdbg` - this will be improved in future.
+If something goes wrong you should restart the target and restart `espdbg`.
 
 `espdbg` uses the log crate and env logger - you can get a lot of information by setting the env-var `RUST_LOG` to `info` or `trace`
 
