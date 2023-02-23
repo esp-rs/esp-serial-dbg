@@ -3,15 +3,14 @@
 #![feature(asm_experimental_arch)]
 
 use esp32_hal::{
-    clock::ClockControl, pac::Peripherals, prelude::*, timer::TimerGroup, Delay, Rtc, Serial,
+    clock::ClockControl, peripherals::Peripherals, prelude::*, timer::TimerGroup, Delay, Rtc, Uart,
 };
 use esp_backtrace as _;
 use esp_println::println;
-use xtensa_lx_rt::entry;
 
 #[entry]
 fn main() -> ! {
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
     let system = peripherals.DPORT.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
@@ -26,7 +25,7 @@ fn main() -> ! {
     wdt0.disable();
     wdt1.disable();
 
-    esp_serial_dbg::init(Serial::new(peripherals.UART0));
+    esp_serial_dbg::init(Uart::new(peripherals.UART0));
 
     let mut delay = Delay::new(&clocks);
 

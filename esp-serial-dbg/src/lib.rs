@@ -9,6 +9,8 @@ use embedded_hal::serial::Write;
 pub use esp32_hal as hal;
 #[cfg(feature = "esp32c3")]
 pub use esp32c3_hal as hal;
+#[cfg(feature = "esp32c2")]
+pub use esp32c2_hal as hal;
 #[cfg(feature = "esp32s2")]
 pub use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
@@ -16,9 +18,8 @@ pub use esp32s3_hal as hal;
 #[allow(unused)]
 use hal::interrupt;
 use hal::macros::interrupt;
-use hal::pac;
 use hal::prelude::nb;
-use hal::{serial::config::AtCmdConfig, Serial};
+use hal::{uart::config::AtCmdConfig, Uart};
 
 const MAX_COMMAND_BUFFER: usize = 256;
 
@@ -42,6 +43,7 @@ pub const CHIP_ESP32: u8 = 0;
 pub const CHIP_ESP32S2: u8 = 1;
 pub const CHIP_ESP32S3: u8 = 2;
 pub const CHIP_ESP32C3: u8 = 3;
+pub const CHIP_ESP32C2: u8 = 4;
 
 pub const PROTOCOL_VERSION: u32 = 0;
 
@@ -49,14 +51,11 @@ pub const PROTOCOL_VERSION: u32 = 0;
 #[cfg_attr(target_arch = "xtensa", path = "xtensa.rs")]
 pub mod arch;
 
-#[cfg(target_arch = "riscv32")]
-type ExceptionContext = crate::hal::interrupt::TrapFrame;
-#[cfg(target_arch = "xtensa")]
-type ExceptionContext = xtensa_lx_rt::exception::Context;
+type ExceptionContext = crate::hal::trapframe::TrapFrame;
 
-static SERIAL: Mutex<RefCell<Option<Serial<hal::pac::UART0>>>> = Mutex::new(RefCell::new(None));
+static SERIAL: Mutex<RefCell<Option<Uart<hal::peripherals::UART0>>>> = Mutex::new(RefCell::new(None));
 
-pub fn store_serial(serial: Serial<hal::pac::UART0>) {
+pub fn store_serial(serial: Uart<'static, hal::peripherals::UART0>) {
     critical_section::with(|cs| {
         SERIAL.borrow(cs).replace(Some(serial));
     });
@@ -64,7 +63,7 @@ pub fn store_serial(serial: Serial<hal::pac::UART0>) {
 
 pub fn with_serial<F, R>(f: F) -> R
 where
-    F: FnOnce(&mut Serial<hal::pac::UART0>) -> R,
+    F: FnOnce(&mut Uart<hal::peripherals::UART0>) -> R,
 {
     critical_section::with(|cs| {
         let mut serial = SERIAL.borrow(cs).borrow_mut();
@@ -75,7 +74,7 @@ where
 }
 
 /// Currently only UART0 supported
-pub fn init(mut serial: Serial<hal::pac::UART0>) {
+pub fn init(mut serial: Uart<'static, hal::peripherals::UART0>) {
     arch::init();
 
     serial.set_at_cmd(AtCmdConfig::new(
@@ -89,7 +88,7 @@ pub fn init(mut serial: Serial<hal::pac::UART0>) {
     serial.listen_at_cmd();
 
     hal::interrupt::enable(
-        hal::pac::Interrupt::UART0,
+        hal::peripherals::Interrupt::UART0,
         #[cfg(target_arch = "riscv32")]
         hal::interrupt::Priority::Priority14,
         #[cfg(target_arch = "xtensa")]
@@ -101,7 +100,7 @@ pub fn init(mut serial: Serial<hal::pac::UART0>) {
 
     #[cfg(target_arch = "riscv32")]
     unsafe {
-        riscv::interrupt::enable();
+        hal::riscv::interrupt::enable();
     }
 }
 
@@ -109,7 +108,7 @@ pub fn init(mut serial: Serial<hal::pac::UART0>) {
 fn UART0(trap_frame: &mut ExceptionContext) {
     critical_section::with(|_cs| {
         #[cfg(target_arch = "riscv32")]
-        let mepc = riscv::register::mepc::read();
+        let mepc = hal::riscv::register::mepc::read();
         #[cfg(target_arch = "xtensa")]
         let mepc = trap_frame.PC as usize;
         with_serial(|serial| {
@@ -123,7 +122,7 @@ fn UART0(trap_frame: &mut ExceptionContext) {
 }
 
 fn serial_com_halted(
-    serial: &mut Serial<hal::pac::UART0>,
+    serial: &mut Uart<hal::peripherals::UART0>,
     trap_frame: &mut ExceptionContext,
     mepc: usize,
 ) {
@@ -142,7 +141,7 @@ fn serial_com_halted(
 }
 
 fn read_command(
-    serial: &mut Serial<hal::pac::UART0>,
+    serial: &mut Uart<hal::peripherals::UART0>,
     buffer: &mut [u8; MAX_COMMAND_BUFFER],
 ) -> usize {
     let mut cnt = 0;
@@ -167,7 +166,7 @@ fn read_command(
 fn handle_cmd(
     buffer: &[u8; 256],
     cnt: usize,
-    serial: &mut Serial<hal::pac::UART0>,
+    serial: &mut Uart<hal::peripherals::UART0>,
     trap_frame: &mut ExceptionContext,
     mepc: usize,
     from_halted_state: bool,
@@ -184,7 +183,7 @@ fn handle_cmd(
 }
 
 fn handle_break(
-    serial: &mut Serial<hal::pac::UART0>,
+    serial: &mut Uart<hal::peripherals::UART0>,
     context: &mut ExceptionContext,
     mepc: usize,
     from_halted_state: bool,
@@ -207,11 +206,11 @@ fn handle_break(
     });
 }
 
-fn send_ack(serial: &mut Serial<hal::pac::UART0>) {
+fn send_ack(serial: &mut Uart<hal::peripherals::UART0>) {
     write_response(serial, ACK_RESPONSE, 0, &mut [].into_iter());
 }
 
-fn readmem_cmd(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+fn readmem_cmd(buffer: &[u8; 256], _cnt: usize, serial: &mut Uart<hal::peripherals::UART0>) {
     let addr = u32::from_le_bytes(buffer[6..][..4].try_into().unwrap());
     let len = u32::from_le_bytes(buffer[10..][..4].try_into().unwrap());
     let len_aligned = if len % 4 != 0 {
@@ -229,14 +228,14 @@ fn readmem_cmd(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UA
     );
 }
 
-fn writemem_cmd(buffer: &[u8; 256], cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+fn writemem_cmd(buffer: &[u8; 256], cnt: usize, serial: &mut Uart<hal::peripherals::UART0>) {
     let addr = u32::from_le_bytes(buffer[6..][..4].try_into().unwrap());
 
     let ptr = addr as *mut u32;
     unsafe {
         for i in (10..(cnt - 1)).step_by(4) {
             let src_ptr = &buffer[i] as *const _ as *const u32;
-            let word = src_ptr.read();
+            let word = src_ptr.read_unaligned();
             ptr.offset(((i - 10) / 4) as isize).write_volatile(word);
         }
     }
@@ -244,7 +243,7 @@ fn writemem_cmd(buffer: &[u8; 256], cnt: usize, serial: &mut Serial<hal::pac::UA
     send_ack(serial);
 }
 
-fn set_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+fn set_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Uart<hal::peripherals::UART0>) {
     let addr = u32::from_le_bytes(buffer[6..][..4].try_into().unwrap());
     let id = buffer[10];
     arch::set_breakpoint(id, addr);
@@ -252,14 +251,14 @@ fn set_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac:
     send_ack(serial);
 }
 
-fn clear_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+fn clear_breakpoint(buffer: &[u8; 256], _cnt: usize, serial: &mut Uart<hal::peripherals::UART0>) {
     let id = buffer[6];
     arch::clear_breakpoint(id);
 
     send_ack(serial);
 }
 
-fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::UART0>) {
+fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Uart<hal::peripherals::UART0>) {
     #[cfg(feature = "esp32")]
     let chip = CHIP_ESP32;
 
@@ -271,6 +270,9 @@ fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::
 
     #[cfg(feature = "esp32c3")]
     let chip = CHIP_ESP32C3;
+
+    #[cfg(feature = "esp32c2")]
+    let chip = CHIP_ESP32C2;
 
     let mut payload = [chip, 0, 0, 0, 0];
 
@@ -284,7 +286,7 @@ fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Serial<hal::pac::
 }
 
 fn write_response(
-    serial: &mut Serial<hal::pac::UART0>,
+    serial: &mut Uart<hal::peripherals::UART0>,
     id: u8,
     payload_len: usize,
     payload: &mut dyn Iterator<Item = u8>,

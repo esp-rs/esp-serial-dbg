@@ -267,7 +267,7 @@ impl SerialDebugConnection {
             }
             HIT_BREAKPOINT_RESPONSE => {
                 let regs = match self.chip {
-                    Chip::Esp32C3 => {
+                    Chip::Esp32C3 | Chip::Esp32C2 => {
                         Registers::Riscv(RiscvRegisters::from_bytes(&packet[6..(packet.len() - 1)]))
                     }
                     Chip::Esp32 | Chip::Esp32S2 | Chip::Esp32S3 => Registers::Xtensa(
@@ -306,6 +306,7 @@ impl SerialDebugConnection {
 
 #[derive(Debug, Clone, Copy)]
 pub enum Chip {
+    Esp32C2,
     Esp32C3,
     Esp32,
     Esp32S2,
@@ -317,6 +318,8 @@ impl FromStr for Chip {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.to_ascii_lowercase().as_str() {
+            "esp32c2" => Ok(Chip::Esp32C2),
+            "esp32-c2" => Ok(Chip::Esp32C2),
             "esp32c3" => Ok(Chip::Esp32C3),
             "esp32-c3" => Ok(Chip::Esp32C3),
             "esp32" => Ok(Chip::Esp32),

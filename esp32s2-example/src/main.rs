@@ -2,28 +2,15 @@
 #![no_main]
 #![feature(asm_experimental_arch)]
 
-use core::cell::RefCell;
-
 use esp32s2_hal::{
-    clock::ClockControl,
-    interrupt::{self, Priority},
-    pac::{self, Peripherals, TIMG0},
-    prelude::*,
-    timer::{Timer, Timer0, TimerGroup},
-    Delay, Rtc, Serial,
+    clock::ClockControl, peripherals::Peripherals, prelude::*, timer::TimerGroup, Delay, Rtc, Uart,
 };
 use esp_backtrace as _;
 use esp_println::println;
-use xtensa_lx::mutex::Mutex;
-use xtensa_lx::mutex::CriticalSectionMutex;
-use xtensa_lx_rt::entry;
-
-static mut TIMER00: CriticalSectionMutex<RefCell<Option<Timer<Timer0<TIMG0>>>>> =
-CriticalSectionMutex::new(RefCell::new(None));
 
 #[entry]
 fn main() -> ! {
-    let peripherals = Peripherals::take().unwrap();
+    let peripherals = Peripherals::take();
     let system = peripherals.SYSTEM.split();
     let clocks = ClockControl::boot_defaults(system.clock_control).freeze();
 
@@ -38,16 +25,7 @@ fn main() -> ! {
     wdt0.disable();
     wdt1.disable();
 
-    let mut timer00 = timer_group0.timer0;
-    interrupt::enable(pac::Interrupt::TG0_T0_LEVEL, Priority::Priority2).unwrap();
-    timer00.start(500u64.millis());
-    timer00.listen();
-
-    unsafe {
-        (&TIMER00).lock(|data| (*data).replace(Some(timer00)));
-    }
-
-    esp_serial_dbg::init(Serial::new(peripherals.UART0));
+    esp_serial_dbg::init(Uart::new(peripherals.UART0));
 
     let mut delay = Delay::new(&clocks);
 
@@ -71,29 +49,5 @@ fn some_function(param: u32) {
 #[ram]
 fn some_ram_function(param: u32) {
     // also SW breakpoints work
-    let mut x = 0;
     println!("hello from ram function! {}", param);
-    x += 1;
-    println!("hello from ram function! x={}", x);
-}
-
-#[interrupt]
-fn TG0_T0_LEVEL() {
-    unsafe {
-        (&TIMER00).lock(|data| {
-            let mut timer = data.borrow_mut();
-            let timer = timer.as_mut().unwrap();
-
-            in_timer();
-
-            if timer.is_interrupt_set() {
-                timer.clear_interrupt();
-                timer.start(500u64.millis());
-            }
-        });
-    }
-}
-
-fn in_timer() {
-    println!("timer");
 }

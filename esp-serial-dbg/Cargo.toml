@@ -4,18 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-xtensa-lx-rt = { version = "0.13.0", optional = true }
-xtensa-lx = { version = "0.7.0", optional = true }
-riscv = { version = "0.8.0", optional = true }
-esp32c3-hal = { version = "0.1.0", optional = true }
-esp32-hal = { version = "0.4.0", optional = true }
-esp32s2-hal = { version = "0.1.0", optional = true }
-esp32s3-hal = { version = "0.1.0", optional = true }
+esp32c2-hal = { version = "0.5.1", optional = true }
+esp32c3-hal = { version = "0.7.0", optional = true }
+esp32-hal = { version = "0.10.0", optional = true }
+esp32s2-hal = { version = "0.7.0", optional = true }
+esp32s3-hal = { version = "0.7.0", optional = true }
 embedded-hal = "0.2.7"
 critical-section = "1.1.0"
 
 [features]
-esp32c3 = [ "riscv", "esp32c3-hal" ]
-esp32 = [ "xtensa-lx-rt/esp32", "xtensa-lx/esp32", "esp32-hal" ]
-esp32s2 = [ "xtensa-lx-rt/esp32s2", "xtensa-lx/esp32s2", "esp32s2-hal" ]
-esp32s3 = [ "xtensa-lx-rt/esp32s3", "xtensa-lx/esp32s3", "esp32s3-hal" ]
+esp32c2 = [ "esp32c2-hal" ]
+esp32c3 = [ "esp32c3-hal" ]
+esp32 = [ "esp32-hal" ]
+esp32s2 = [ "esp32s2-hal" ]
+esp32s3 = [ "esp32s3-hal" ]

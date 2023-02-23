@@ -1,5 +1,6 @@
 use super::with_serial;
 use core::arch::asm;
+use crate::hal::trapframe::TrapFrame;
 
 pub fn init() {
     // nothing
@@ -103,7 +104,7 @@ pub fn clear_breakpoint(id: u8) {
 }
 
 #[no_mangle]
-fn level6_interrupt(save_frame: &mut xtensa_lx_rt::exception::Context) {
+fn level6_interrupt(save_frame: &mut TrapFrame) {
     with_serial(|serial| {
         let regs_raw = serialze_registers(save_frame, save_frame.PC as usize);
 
@@ -120,7 +121,7 @@ fn level6_interrupt(save_frame: &mut xtensa_lx_rt::exception::Context) {
 }
 
 pub fn serialze_registers(
-    context: &mut xtensa_lx_rt::exception::Context,
+    context: &mut TrapFrame,
     _mepc: usize,
 ) -> [u8; 54 * 4] {
     let mut regs_raw = [0u8; 54 * 4];

@@ -101,7 +101,7 @@ dependencies = [
  "embedded-hal",
  "esp-hal-procmacros",
  "esp-riscv-rt",
- "esp32c3",
+ "esp32c2",
  "fugit",
  "nb 1.0.0",
  "paste",
@@ -147,17 +147,28 @@ version = "0.1.0"
 dependencies = [
  "critical-section",
  "embedded-hal",
- "esp32c3-hal",
+ "esp32c2-hal",
 ]
 
 [[package]]
-name = "esp32c3"
-version = "0.11.0"
+name = "esp32c2"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "471e4ccbeb7b898927ff8e115288353b47cf9c948c75c1d25a0e71c9b97678ae"
+checksum = "3bca00b67602688e128cafcd8b789bb19c90370c0dce7252d4d7c5597b41dfed"
 dependencies = [
  "critical-section",
  "vcell",
+]
+
+[[package]]
+name = "esp32c2-hal"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "186e154675bf98dd33c2a6bd3919a971efe746ae034f4992801c3e7b023cc960"
+dependencies = [
+ "embedded-hal",
+ "esp-hal-common",
+ "r0",
 ]
 
 [[package]]
@@ -168,19 +179,7 @@ dependencies = [
  "esp-backtrace",
  "esp-println",
  "esp-serial-dbg",
- "esp32c3-hal",
-]
-
-[[package]]
-name = "esp32c3-hal"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfd7f5e718f699c26e112ecb09233c2d8b401db2316625cd78a729ab75f775f9"
-dependencies = [
- "cfg-if",
- "embedded-hal",
- "esp-hal-common",
- "r0",
+ "esp32c2-hal",
 ]
 
 [[package]]

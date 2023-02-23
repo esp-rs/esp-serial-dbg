@@ -4,7 +4,7 @@
 use core::cell::RefCell;
 
 use critical_section::Mutex;
-use esp32c3_hal::{
+use esp32c2_hal::{
     clock::ClockControl,
     interrupt,
     peripherals::{Peripherals, TIMG0},
@@ -27,13 +27,10 @@ fn main() -> ! {
     let mut rtc = Rtc::new(peripherals.RTC_CNTL);
     let timer_group0 = TimerGroup::new(peripherals.TIMG0, &clocks);
     let mut wdt0 = timer_group0.wdt;
-    let timer_group1 = TimerGroup::new(peripherals.TIMG1, &clocks);
-    let mut wdt1 = timer_group1.wdt;
 
     rtc.swd.disable();
     rtc.rwdt.disable();
     wdt0.disable();
-    wdt1.disable();
 
     esp_serial_dbg::init(Uart::new(peripherals.UART0));
 
@@ -41,7 +38,7 @@ fn main() -> ! {
 
     let mut timer0 = timer_group0.timer0;
     interrupt::enable(
-        esp32c3_hal::peripherals::Interrupt::TG0_T0_LEVEL,
+        esp32c2_hal::peripherals::Interrupt::TG0_T0_LEVEL,
         interrupt::Priority::Priority1,
     )
     .unwrap();
