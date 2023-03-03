@@ -1,6 +1,6 @@
 use super::with_serial;
-use crate::hal::trapframe::TrapFrame;
 use crate::hal::riscv;
+use crate::hal::trapframe::TrapFrame;
 use core::arch::asm;
 
 pub fn init() {

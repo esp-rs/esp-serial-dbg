@@ -29,6 +29,8 @@ pub const CHIP_ESP32: u8 = 0;
 pub const CHIP_ESP32S2: u8 = 1;
 pub const CHIP_ESP32S3: u8 = 2;
 pub const CHIP_ESP32C3: u8 = 3;
+pub const CHIP_ESP32C2: u8 = 4;
+pub const CHIP_ESP32C6: u8 = 5;
 
 pub const SUPPORTED_PROTOCOL_VERSION: u32 = 0;
 
@@ -267,7 +269,7 @@ impl SerialDebugConnection {
             }
             HIT_BREAKPOINT_RESPONSE => {
                 let regs = match self.chip {
-                    Chip::Esp32C3 | Chip::Esp32C2 => {
+                    Chip::Esp32C3 | Chip::Esp32C2 | Chip::Esp32C6 => {
                         Registers::Riscv(RiscvRegisters::from_bytes(&packet[6..(packet.len() - 1)]))
                     }
                     Chip::Esp32 | Chip::Esp32S2 | Chip::Esp32S3 => Registers::Xtensa(
@@ -308,6 +310,7 @@ impl SerialDebugConnection {
 pub enum Chip {
     Esp32C2,
     Esp32C3,
+    Esp32C6,
     Esp32,
     Esp32S2,
     Esp32S3,
@@ -322,6 +325,8 @@ impl FromStr for Chip {
             "esp32-c2" => Ok(Chip::Esp32C2),
             "esp32c3" => Ok(Chip::Esp32C3),
             "esp32-c3" => Ok(Chip::Esp32C3),
+            "esp32c6" => Ok(Chip::Esp32C6),
+            "esp32-c6" => Ok(Chip::Esp32C6),
             "esp32" => Ok(Chip::Esp32),
             "esp32-s2" => Ok(Chip::Esp32S2),
             "esp32s2" => Ok(Chip::Esp32S2),

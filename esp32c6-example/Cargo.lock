@@ -3,50 +3,22 @@
 version = 3
 
 [[package]]
-name = "aho-corasick"
-version = "0.7.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e37cfd5e7657ada45f742d6e99ca5788580b5c529dc78faf11ece6dc702656f"
-dependencies = [
- "memchr",
-]
-
-[[package]]
-name = "anyhow"
-version = "1.0.62"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1485d4d2cc45e7b201ee3767015c96faa5904387c9d87c6efdd0fb511f12d305"
-
-[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 
 [[package]]
-name = "bare-metal"
-version = "1.0.0"
+name = "bit_field"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8fe8f5a8a398345e52358e18ff07cc17a568fbca5c6f73873d3a62056309603"
+checksum = "dcb6dd1c2376d2e096796e234a70e17e94cc2d5d54ff8ce42b28cef1d0d359a4"
 
 [[package]]
 name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
-
-[[package]]
-name = "core-isa-parser"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23ec98e54b735872e54b2335c2e5a5c7fa7d9c3bfd45500f75280f84089a0083"
-dependencies = [
- "anyhow",
- "enum-as-inner",
- "regex",
- "strum",
- "strum_macros",
-]
 
 [[package]]
 name = "critical-section"
@@ -109,18 +81,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "enum-as-inner"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21cdad81446a7f7dc43f6a77409efeb9733d2fa65553efef6018ef257c959b73"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "esp-backtrace"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -132,31 +92,27 @@ dependencies = [
 [[package]]
 name = "esp-hal-common"
 version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5df3ec9a2e4df155e5a99f50b76a3a6733e69941d453085d3258846e1bd0a64e"
+source = "git+https://github.com/esp-rs/esp-hal?rev=7cf7d8eeac9172b24f0fba7ae659ec39925ce04f#7cf7d8eeac9172b24f0fba7ae659ec39925ce04f"
 dependencies = [
  "cfg-if",
  "critical-section",
  "embedded-dma",
  "embedded-hal",
  "esp-hal-procmacros",
- "esp-synopsys-usb-otg",
- "esp32s2",
+ "esp-riscv-rt",
+ "esp32c6",
  "fugit",
  "nb 1.0.0",
  "paste",
+ "riscv-atomic-emulation-trap",
  "strum",
- "usb-device",
  "void",
- "xtensa-lx",
- "xtensa-lx-rt",
 ]
 
 [[package]]
 name = "esp-hal-procmacros"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "214510c5399a574ee6a521be48851d06aaa188b40c4b6b8f2a2c3b8d22afd12e"
+source = "git+https://github.com/esp-rs/esp-hal?rev=7cf7d8eeac9172b24f0fba7ae659ec39925ce04f#7cf7d8eeac9172b24f0fba7ae659ec39925ce04f"
 dependencies = [
  "darling",
  "proc-macro-crate",
@@ -176,56 +132,55 @@ dependencies = [
 ]
 
 [[package]]
+name = "esp-riscv-rt"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c363bf30aae3c13e849315b73227de75dca813de53f5233f1fa7064f5adea641"
+dependencies = [
+ "r0",
+ "riscv",
+ "riscv-rt-macros",
+]
+
+[[package]]
 name = "esp-serial-dbg"
 version = "0.1.0"
 dependencies = [
  "critical-section",
  "embedded-hal",
- "esp32s2-hal",
+ "esp32c6-hal",
 ]
 
 [[package]]
-name = "esp-synopsys-usb-otg"
-version = "0.3.1"
+name = "esp32c6"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0879f2f008c0213b1a5959345e54afcbf1490c1591f5145a5e65bdff371b65af"
-dependencies = [
- "critical-section",
- "embedded-hal",
- "usb-device",
- "vcell",
-]
-
-[[package]]
-name = "esp32s2"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6ac1524e64f5277353b3094916e80a7ca7465af3bfff7bd32c0006109b8cb60"
+checksum = "daccdd87b5d98a5dc6ce03c8bcbf28b838e01e03a8ad5d71bc5f42a3abde2e2f"
 dependencies = [
  "critical-section",
  "vcell",
- "xtensa-lx",
 ]
 
 [[package]]
-name = "esp32s2-hal"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2ea99cc40bd78f19f0540f3cc8e9c7969ebda0f7fb92a83177a8ccd79828cb0f"
-dependencies = [
- "embedded-hal",
- "esp-hal-common",
- "xtensa-atomic-emulation-trap",
-]
-
-[[package]]
-name = "esp32s2_example"
+name = "esp32c6-example"
 version = "0.1.0"
 dependencies = [
+ "critical-section",
  "esp-backtrace",
  "esp-println",
  "esp-serial-dbg",
- "esp32s2-hal",
+ "esp32c6-hal",
+]
+
+[[package]]
+name = "esp32c6-hal"
+version = "0.1.0"
+source = "git+https://github.com/esp-rs/esp-hal?rev=7cf7d8eeac9172b24f0fba7ae659ec39925ce04f#7cf7d8eeac9172b24f0fba7ae659ec39925ce04f"
+dependencies = [
+ "cfg-if",
+ "embedded-hal",
+ "esp-hal-common",
+ "r0",
 ]
 
 [[package]]
@@ -260,9 +215,9 @@ checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 
 [[package]]
 name = "heck"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2540771e65fc8cb83cd6e8a237f70c319bd5c29f78ed1084ba5d50eeac86f7f9"
+checksum = "95505c38b4572b2d910cecb0281560f54b440a19336cbbcb27bf6ce6adc6f5a8"
 
 [[package]]
 name = "ident_case"
@@ -285,21 +240,6 @@ name = "memchr"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
-
-[[package]]
-name = "minijinja"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "359c4820413be7706e93999171652e140578384f85faac14cb22d350bd0fbabf"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "mutex-trait"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4bb1638d419e12f8b1c43d9e639abd0d1424285bdea2f76aa231e233c63cd3a"
 
 [[package]]
 name = "nb"
@@ -396,33 +336,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd7a31eed1591dcbc95d92ad7161908e72f4677f8fabf2a32ca49b4237cbf211"
 
 [[package]]
-name = "regex"
-version = "1.6.0"
+name = "riscv"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c4eb3267174b8c6c2f654116623910a0fef09c4753f8dd83db29c48a0df988b"
+checksum = "aa3145d2fae3778b1e31ec2e827b228bdc6abd9b74bb5705ba46dcb82069bc4f"
 dependencies = [
- "aho-corasick",
- "memchr",
- "regex-syntax",
+ "bit_field",
+ "critical-section",
+ "embedded-hal",
 ]
 
 [[package]]
-name = "regex-syntax"
-version = "0.6.27"
+name = "riscv-atomic-emulation-trap"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a3f87b73ce11b1619a3c6332f45341e0047173771e8b8b73f87bfeefb7b56244"
+checksum = "da39f4a5642a62e8e16bb438c37e6f90ea388ca0b7960fe875ea39887155d6ba"
+
+[[package]]
+name = "riscv-rt-macros"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f38509d7b17c2f604ceab3e5ff8ac97bb8cd2f544688c512be75c715edaf4daf"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
 
 [[package]]
 name = "rustversion"
-version = "1.0.9"
+version = "1.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97477e48b4cf8603ad5f7aaf897467cf42ab4218a38ef76fb14c2d6773a6d6a8"
-
-[[package]]
-name = "serde"
-version = "1.0.144"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0f747710de3dcd43b88c9168773254e809d8ddbdf9653b84e2554ab219f17860"
+checksum = "5583e89e108996506031660fe09baa5011b9dd0341b89029313006d1fb508d70"
 
 [[package]]
 name = "stable_deref_trait"
@@ -493,12 +438,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c4f5b37a154999a8f3f98cc23a628d850e154479cd94decf3414696e12e31aaf"
 
 [[package]]
-name = "usb-device"
-version = "0.2.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f6cc3adc849b5292b4075fc0d5fdcf2f24866e88e336dd27a8943090a520508"
-
-[[package]]
 name = "vcell"
 version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -515,43 +454,3 @@ name = "void"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a02e4885ed3bc0f2de90ea6dd45ebcbb66dacffe03547fadbb0eeae2770887d"
-
-[[package]]
-name = "xtensa-atomic-emulation-trap"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8cd1632531f5d8ba78dabeff8b006a0d675560f436727479138a3dd194f0582b"
-
-[[package]]
-name = "xtensa-lx"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9490addc0a1edd86e571a9ed8063f33d8224f981e61bbf72279671ed0cb4bb7c"
-dependencies = [
- "bare-metal",
- "mutex-trait",
-]
-
-[[package]]
-name = "xtensa-lx-rt"
-version = "0.15.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f68fea36eb8e2d5ff4c99d367527f4a56e484b16c5e84abf4195988bd845a3fc"
-dependencies = [
- "bare-metal",
- "core-isa-parser",
- "minijinja",
- "r0",
- "xtensa-lx-rt-proc-macros",
-]
-
-[[package]]
-name = "xtensa-lx-rt-proc-macros"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3283815e334d3e5d21868dc3c7140720b2a784238289b1127b67908c89404b79"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]

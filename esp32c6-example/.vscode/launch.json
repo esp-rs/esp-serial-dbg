@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "GDB",
+            "type": "gdb",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "target": "${workspaceRoot}/target/riscv32imac-unknown-none-elf/debug/esp32c6-example",
+            "gdbpath": "riscv32-esp-elf-gdb",
+            "autorun": [
+                "set arch riscv:rv32",
+                "target remote localhost:9001",
+                "symbol-file ./target/riscv32imac-unknown-none-elf/debug/esp32c6-example",
+            ],
+            //"printCalls": true,     
+            //"showDevDebugOutput": true,
+            //"valuesFormatting": "parseText",
+        }
+    ]
+}

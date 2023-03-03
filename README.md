@@ -2,9 +2,9 @@
 
 ## About
 
-_This is experimental! At least the contained examples should work fine on ESP32, ESP32-S2, ESP32-S3, ESP32-C2 and ESP32-C3._
+_This is experimental! At least the contained examples should work fine on ESP32, ESP32-S2, ESP32-S3, ESP32-C2, ESP32-C3 and ESP32-C6._
 
-This is a way to do some basic debugging via a serial connection on ESP32, ESP32-S3,ESP32-S2, ESP32-C2 and ESP32-C3 without additional hardware when developing code with `esp-hal`.
+This is a way to do some basic debugging via a serial connection on ESP32, ESP32-S3,ESP32-S2, ESP32-C2, ESP32-C3 and ESP32-C6 without additional hardware when developing code with `esp-hal`.
 
 ## Basic Usage
 
