@@ -1,0 +1,13 @@
+[package]
+name = "esp32c6-example"
+version = "0.1.0"
+authors = ["bjoernQ <bjoern.quentin@mobile-j.de>"]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+esp32c6-hal = { git = "https://github.com/esp-rs/esp-hal", package = "esp32c6-hal", rev = "7cf7d8eeac9172b24f0fba7ae659ec39925ce04f" }
+esp-backtrace = { version = "0.6.0", features = ["esp32c6", "panic-handler", "print-uart"] }
+esp-serial-dbg = { path = "../esp-serial-dbg", features = ["esp32c6"] }
+esp-println = { version = "0.4.0", features = ["esp32c6"]}
+critical-section = "1.1.0"

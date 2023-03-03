@@ -22,7 +22,7 @@ use gdbstub::{
 };
 use log::{info, trace};
 
-pub mod riscv_esp32c3;
+pub mod riscv_esp32x;
 mod riscv_insn_estimator;
 pub mod xtensa_esp32;
 pub mod xtensa_esp32s2;

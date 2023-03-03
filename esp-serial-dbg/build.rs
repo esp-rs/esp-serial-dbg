@@ -3,6 +3,7 @@ fn main() {
         cfg!(feature = "esp32"),
         cfg!(feature = "esp32c2"),
         cfg!(feature = "esp32c3"),
+        cfg!(feature = "esp32c6"),
         cfg!(feature = "esp32s2"),
         cfg!(feature = "esp32s3"),
     ];

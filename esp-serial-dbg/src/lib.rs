@@ -11,6 +11,8 @@ pub use esp32_hal as hal;
 pub use esp32c3_hal as hal;
 #[cfg(feature = "esp32c2")]
 pub use esp32c2_hal as hal;
+#[cfg(feature = "esp32c6")]
+pub use esp32c6_hal as hal;
 #[cfg(feature = "esp32s2")]
 pub use esp32s2_hal as hal;
 #[cfg(feature = "esp32s3")]
@@ -44,6 +46,7 @@ pub const CHIP_ESP32S2: u8 = 1;
 pub const CHIP_ESP32S3: u8 = 2;
 pub const CHIP_ESP32C3: u8 = 3;
 pub const CHIP_ESP32C2: u8 = 4;
+pub const CHIP_ESP32C6: u8 = 5;
 
 pub const PROTOCOL_VERSION: u32 = 0;
 
@@ -273,6 +276,9 @@ fn handle_hello(_buffer: &[u8; 256], _cnt: usize, serial: &mut Uart<hal::periphe
 
     #[cfg(feature = "esp32c2")]
     let chip = CHIP_ESP32C2;
+
+    #[cfg(feature = "esp32c6")]
+    let chip = CHIP_ESP32C6;
 
     let mut payload = [chip, 0, 0, 0, 0];
 

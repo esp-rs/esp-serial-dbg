@@ -122,9 +122,9 @@ dependencies = [
 
 [[package]]
 name = "esp-backtrace"
-version = "0.5.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e57b6eded586c6539146fd2511d13ca120e4d5e4d7eb56b69da6ae8e76b748ff"
+checksum = "e628c86c7f56b0511f7ce1d6b1fe9abe070d89556f227e297ed0c8122b9aaef6"
 dependencies = [
  "esp-println",
 ]
@@ -167,9 +167,12 @@ dependencies = [
 
 [[package]]
 name = "esp-println"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61434785da602a7838c360031628ac3cd0bd9e3412b618f2af000050541778ec"
+checksum = "c33a9d1eb60882ec910021bda7b67ce789dd0d6325b886e6739ef9d8f495ae22"
+dependencies = [
+ "critical-section",
+]
 
 [[package]]
 name = "esp-serial-dbg"
