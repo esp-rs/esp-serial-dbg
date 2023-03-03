@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 use parse_int::parse;
 use rustyline::error::ReadlineError;
-use rustyline::Editor;
+use rustyline::DefaultEditor;
 use std::time::Duration;
 use std::{io, thread};
 
@@ -108,7 +108,7 @@ fn run_cli(dbg: SerialDebugConnection) {
         }
 
         let mut input_mode = false;
-        let mut rl = Editor::<()>::new().unwrap();
+        let mut rl = DefaultEditor::new().unwrap();
         loop {
             if !input_mode {
                 let mut buf = String::new();
@@ -175,7 +175,7 @@ fn run_cli(dbg: SerialDebugConnection) {
                                 }
                             }
 
-                            rl.add_history_entry(line);
+                            rl.add_history_entry(line).ok();
                         }
                         Err(ReadlineError::Interrupted) => {
                             break;

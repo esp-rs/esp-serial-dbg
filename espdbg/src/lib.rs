@@ -326,7 +326,7 @@ impl FromStr for Chip {
             "esp32c3" => Ok(Chip::Esp32C3),
             "esp32-c3" => Ok(Chip::Esp32C3),
             "esp32c6" => Ok(Chip::Esp32C6),
-            "esp32-c6" => Ok(Chip::Esp32C6),            
+            "esp32-c6" => Ok(Chip::Esp32C6),
             "esp32" => Ok(Chip::Esp32),
             "esp32-s2" => Ok(Chip::Esp32S2),
             "esp32s2" => Ok(Chip::Esp32S2),

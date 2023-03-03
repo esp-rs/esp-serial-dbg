@@ -7,10 +7,10 @@ use embedded_hal::serial::Read;
 use embedded_hal::serial::Write;
 #[cfg(feature = "esp32")]
 pub use esp32_hal as hal;
-#[cfg(feature = "esp32c3")]
-pub use esp32c3_hal as hal;
 #[cfg(feature = "esp32c2")]
 pub use esp32c2_hal as hal;
+#[cfg(feature = "esp32c3")]
+pub use esp32c3_hal as hal;
 #[cfg(feature = "esp32c6")]
 pub use esp32c6_hal as hal;
 #[cfg(feature = "esp32s2")]
@@ -56,7 +56,8 @@ pub mod arch;
 
 type ExceptionContext = crate::hal::trapframe::TrapFrame;
 
-static SERIAL: Mutex<RefCell<Option<Uart<hal::peripherals::UART0>>>> = Mutex::new(RefCell::new(None));
+static SERIAL: Mutex<RefCell<Option<Uart<hal::peripherals::UART0>>>> =
+    Mutex::new(RefCell::new(None));
 
 pub fn store_serial(serial: Uart<'static, hal::peripherals::UART0>) {
     critical_section::with(|cs| {

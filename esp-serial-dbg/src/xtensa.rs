@@ -1,6 +1,6 @@
 use super::with_serial;
-use core::arch::asm;
 use crate::hal::trapframe::TrapFrame;
+use core::arch::asm;
 
 pub fn init() {
     // nothing
@@ -120,10 +120,7 @@ fn level6_interrupt(save_frame: &mut TrapFrame) {
     });
 }
 
-pub fn serialze_registers(
-    context: &mut TrapFrame,
-    _mepc: usize,
-) -> [u8; 54 * 4] {
+pub fn serialze_registers(context: &mut TrapFrame, _mepc: usize) -> [u8; 54 * 4] {
     let mut regs_raw = [0u8; 54 * 4];
     regs_raw[0..][..4].copy_from_slice(&context.PC.to_le_bytes());
     regs_raw[4..][..4].copy_from_slice(&context.PS.to_le_bytes());
