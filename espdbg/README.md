@@ -1,5 +1,3 @@
-# THIS IS DISCONTINUED
-
 # esp-serial-dbg command line utility
 
 ## Usage

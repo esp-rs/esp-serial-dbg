@@ -1,3 +1,5 @@
+# THIS IS DISCONTINUED
+
 # esp-serial-dbg - debugging of esp-hal based applications via serial
 
 ## About
